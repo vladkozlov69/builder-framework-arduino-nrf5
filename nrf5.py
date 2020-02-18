@@ -127,7 +127,9 @@ elif "NRF51_S130" in cpp_defines:
     softdevice_ver = "s130"
 elif "NRF51_S110" in cpp_defines:
     softdevice_ver = "s110"
-
+elif "NRF52_S140" in cpp_defines:
+    softdevice_ver = "s140"
+    
 if softdevice_ver:
 
     env.Append(
