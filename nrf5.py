@@ -81,7 +81,7 @@ env.Append(
 
     LINKFLAGS=[
         "-Os",
-        "-Wl,--gc-sections",
+        "-Wl,--gc-sections,--relax",
         "-mthumb",
         "--specs=nano.specs",
         "--specs=nosys.specs",
@@ -110,12 +110,14 @@ if board.get("build.cpu") == "cortex-m4":
     env.Append(
         CCFLAGS=[
             "-mfloat-abi=softfp",
+#            "-mfloat-abi=hard",
             "-mfpu=fpv4-sp-d16"
         ]
     )
 
 env.Append(
-    ASFLAGS=env.get("CCFLAGS", [])[:]
+    ASFLAGS=env.get("CCFLAGS", [])[:],
+    CPPDEFINES=["%s" % board.get("build.mcu", "")[0:5].upper()]
 )
 
 # Process softdevice options
@@ -129,7 +131,7 @@ elif "NRF51_S110" in cpp_defines:
     softdevice_ver = "s110"
 elif "NRF52_S140" in cpp_defines:
     softdevice_ver = "s140"
-    
+
 if softdevice_ver:
 
     env.Append(
@@ -151,22 +153,23 @@ if softdevice_ver:
     if "SOFTDEVICEHEX" not in env:
         print("Warning! Cannot find an appropriate softdevice binary!")
 
-    if not board.get("build.ldscript", ""):
-        # Update linker script:
-        ldscript_dir = join(FRAMEWORK_DIR, "cores",
-                            board.get("build.core"), "SDK",
-                            "components", "softdevice", softdevice_ver,
-                            "toolchain", "armgcc")
-        mcu_family = board.get("build.arduino.ldscript", "").split("_")[1]
-        ldscript_path = ""
-        for f in listdir(ldscript_dir):
-            if f.endswith(mcu_family) and softdevice_ver in f.lower():
-                ldscript_path = join(ldscript_dir, f)
-            if ldscript_path:
-                env.Replace(LDSCRIPT_PATH=ldscript_path)
-            else:
-                print("Warning! Cannot find an appropriate linker script for the "
-                      "required softdevice!")
+    # Update linker script:
+    ldscript_dir = join(FRAMEWORK_DIR, "cores",
+                        board.get("build.core"), "SDK",
+                        "components", "softdevice", softdevice_ver,
+                        "toolchain", "armgcc")
+    mcu_family = board.get("build.ldscript", "").split("_")[1]
+    ldscript_path = ""
+    for f in listdir(ldscript_dir):
+        if f.endswith(mcu_family) and softdevice_ver in f.lower():
+            ldscript_path = join(ldscript_dir, f)
+
+    if ldscript_path:
+        env.Replace(LDSCRIPT_PATH=ldscript_path)
+        print("Linker Script: %s" % ldscript_path)
+    else:
+        print("Warning! Cannot find an appropriate linker script for the "
+              "required softdevice!")
 
 # Select crystal oscillator as the low frequency source by default
 clock_options = ("USE_LFXO", "USE_LFRC", "USE_LFSYNT")
