@@ -131,6 +131,8 @@ elif "NRF51_S110" in cpp_defines:
     softdevice_ver = "s110"
 elif "NRF52_S140" in cpp_defines:
     softdevice_ver = "s140"
+elif "NRF52_S113" in cpp_defines:
+    softdevice_ver = "s113"
 
 if softdevice_ver:
 
