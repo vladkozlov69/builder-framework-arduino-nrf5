@@ -227,7 +227,11 @@ if(isdir(sysview_path)):
         ]
     )
 
-usb_path = join(CORE_DIR, "Adafruit_TinyUSB_Core")
+tinyusb_path = join(CORE_DIR, "TinyUSB")
+usb_path = join(tinyusb_path, "Adafruit_TinyUSB_ArduinoCore")
+
+print("usb_path:" + usb_path)
+
 if(isdir(usb_path)):
     if (not env.subst("$BOARD").endswith("nrf52832")):
         env.Append(
@@ -239,6 +243,7 @@ if(isdir(usb_path)):
 
     env.Append(
         CPPPATH=[
+            join(tinyusb_path),
             join(usb_path),
             join(usb_path, "tinyusb", "src")
         ]
