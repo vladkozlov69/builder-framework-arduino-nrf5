@@ -106,23 +106,34 @@ if "BOARD" in env:
         ]
     )
 
-if board.get("build.cpu") == "cortex-m4":
-    env.Append(
-        CCFLAGS=[
-            "-mfloat-abi=softfp",
-#            "-mfloat-abi=hard",
-            "-mfpu=fpv4-sp-d16"
-        ]
-    )
-
 env.Append(
     ASFLAGS=env.get("CCFLAGS", [])[:],
     CPPDEFINES=["%s" % board.get("build.mcu", "")[0:5].upper()]
 )
 
+cpp_defines = env.Flatten(env.get("CPPDEFINES", []))
+
+if board.get("build.cpu") == "cortex-m4":
+   if ("NRF52810" in cpp_defines) or ("NRF52811" in cpp_defines):
+        env.Append(
+            CCFLAGS=[
+                "-mfloat-abi=soft",
+                "-mfpu=fpv4-sp-d16"
+            ]
+        )
+   else:
+        env.Append(
+            CCFLAGS=[
+                "-mfloat-abi=softfp",
+    #            "-mfloat-abi=hard",
+                "-mfpu=fpv4-sp-d16"
+            ]
+        )
+
+
 # Process softdevice options
 softdevice_ver = None
-cpp_defines = env.Flatten(env.get("CPPDEFINES", []))
+
 if "NRF52_S132" in cpp_defines:
     softdevice_ver = "s132"
 elif "NRF51_S130" in cpp_defines:
