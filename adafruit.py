@@ -40,9 +40,9 @@ assert isdir(CORE_DIR)
 NORDIC_DIR = join(CORE_DIR, "nordic")
 assert isdir(NORDIC_DIR)
 
-default_bsp_version = "0.18.0"
+default_bsp_version = "0.19.0"
 default_softdevice_version = "6.1.1"
-default_bootloader_version = "0.3.0"
+default_bootloader_version = "0.3.2"
 
 # Read defaults from build.txt/platform.txt/programmers.txt
 with open(join(FRAMEWORK_DIR, "platform.txt"), "r") as fp:
@@ -183,9 +183,6 @@ if softdevice_name:
             if f == "{0}_bootloader-{1}_{2}_{3}.hex".format(
                     variant, bootloader_version, softdevice_name, softdevice_version):
                 env.Append(DFUBOOTHEX=join(hex_path, f))
-
-    if "DFUBOOTHEX" not in env:
-        print("Warning! Cannot find an appropriate softdevice binary!")
 
     if not board.get("build.ldscript", ""):
         # Update linker script:
