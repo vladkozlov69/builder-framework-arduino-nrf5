@@ -174,6 +174,7 @@ if softdevice_ver:
                         "components", "softdevice", softdevice_ver,
                         "toolchain", "armgcc")
     mcu_family = board.get("build.ldscript", "").split("_")[1]
+    ldscript_path = ""
     for f in listdir(ldscript_dir):
         if f.endswith(mcu_family) and softdevice_ver in f.lower():
             ldscript_path = join(ldscript_dir, f)
@@ -184,10 +185,6 @@ if softdevice_ver:
     else:
         print("Warning! Cannot find an appropriate linker script for the "
               "required softdevice!")
-
-if not board.get("build.ldscript", ""):
-    # if SoftDevice is not specified use default ld script from the framework
-    env.Replace(LDSCRIPT_PATH=ldscript_path or board.get("build.arduino.ldscript", ""))
 
 # Select crystal oscillator as the low frequency source by default
 clock_options = ("USE_LFXO", "USE_LFRC", "USE_LFSYNT")
