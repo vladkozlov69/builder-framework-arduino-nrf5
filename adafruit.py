@@ -171,14 +171,22 @@ if softdevice_name:
                  "%s_nrf52_%s_API" % (softdevice_name, softdevice_version), "include")
         ],
         CPPDEFINES=[
-            softdevice_name.upper(),
+            "%s" % softdevice_name.upper(),
             "NRF52_" + (softdevice_name.upper()),
             "SOFTDEVICE_PRESENT"
         ]
     )
 
+    softdevice_hex_path = join(FRAMEWORK_DIR, "softdevice", board_name)
+
+    if(isdir(softdevice_hex_path)):
+        for f in listdir(softdevice_hex_path):
+            if f.startswith(softdevice_name) and f.endswith(".hex"):
+                env.Append(SOFTDEVICEHEX=join(softdevice_hex_path, f))
+
     hex_path = join(FRAMEWORK_DIR, "bootloader", board_name)
-    if isdir(hex_path):
+
+    if(isdir(hex_path)):
         for f in listdir(hex_path):
             if f == "{0}_bootloader-{1}_{2}_{3}.hex".format(
                     variant, bootloader_version, softdevice_name, softdevice_version):
@@ -196,7 +204,7 @@ if softdevice_name:
                   "required softdevice!")
 
 freertos_path = join(CORE_DIR, "freertos")
-if isdir(freertos_path):
+if(isdir(freertos_path)):
     env.Append(
         CPPPATH=[
             join(freertos_path, "Source", "include"),
@@ -207,7 +215,7 @@ if isdir(freertos_path):
     )
 
 sysview_path = join(CORE_DIR, "sysview")
-if isdir(sysview_path):
+if(isdir(sysview_path)):
     env.Append(
         CPPPATH=[
             join(sysview_path, "SEGGER"),
@@ -215,9 +223,13 @@ if isdir(sysview_path):
         ]
     )
 
-usb_path = join(CORE_DIR, "TinyUSB")
-if isdir(usb_path):
-    if env.subst("$BOARD") != "adafruit_feather_nrf52832":
+tinyusb_path = join(CORE_DIR, "TinyUSB")
+usb_path = join(tinyusb_path, "Adafruit_TinyUSB_ArduinoCore")
+
+print("usb_path:" + usb_path)
+
+if(isdir(usb_path)):
+    if (not env.subst("$BOARD").endswith("nrf52832")):
         env.Append(
             CPPDEFINES=[
                 "USBCON",
@@ -227,9 +239,9 @@ if isdir(usb_path):
 
     env.Append(
         CPPPATH=[
-            usb_path,
-            join(usb_path, "Adafruit_TinyUSB_ArduinoCore"),
-            join(usb_path, "Adafruit_TinyUSB_ArduinoCore", "tinyusb", "src")
+            join(tinyusb_path),
+            join(usb_path),
+            join(usb_path, "tinyusb", "src")
         ]
     )
 
